@@ -1,18 +1,43 @@
-import fs from 'fs';
-import Papa from 'papaparse';
-import type { Child, Driver } from '$lib/types';
+import {
+	type Child,
+	type Parent,
+	type FamilySheetSchema,
+	type Sex,
+	type Family,
+	isSex
+} from '$lib/family';
 
-export const readCsv = (filepath: string) => {
-	const children: Child[] = [];
-	const drivers: Driver[] = [];
+export function makeFamilies(data: FamilySheetSchema[]) {
+	const familyArr: Family[] = [];
+	for (const family of data) {
+		const parents: [Parent, Parent?] = [
+			{
+				name: family['Parent 1'],
+				sex: family['Parent 1 Sex'],
+				cellNumber: family['Parent 1 Cell']
+			},
+			family['Parent 2'] && family['Parent 2 Sex'] && family['Parent 2 Cell']
+				? {
+						name: family['Parent 2'],
+						sex: family['Parent 2 Sex'],
+						cellNumber: family['Parent 2 Cell']
+					}
+				: undefined
+		];
+		const children: Child[] = [];
 
-	fs.promises.readFile(filepath, 'utf-8').then((csvData) => {
-		Papa.parse(csvData, {
-			header: true,
-			skipEmptyLines: 'greedy',
-			complete: (results) => console.log(results)
-		});
-	});
-};
+		for (let i = 1; i <= 20; i++) {
+			const childName = family[`Child ${i}`];
+			const childSex = isSex(family[`Child ${i} Sex`]) ? family[`Child ${i} Sex`] : undefined;
 
-readCsv('/home/michael/Projects/RidgeHacksRewrite/src/lib/test.csv');
+			if (childName && childSex) {
+				children.push({ name: childName, sex: childSex });
+			}
+		}
+
+		const passengerCapacity = parseInt(family['Passenger Capacity']);
+		const address = family['Address'];
+		familyArr.push({ parents, children, passengerCapacity, address });
+	}
+	return familyArr;
+}
