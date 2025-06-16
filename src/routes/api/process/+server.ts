@@ -1,7 +1,7 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import { makeFamilies } from '$lib/csv-parser';
-import { getLatAndLong } from '$lib/mapping';
-import { createDrivers } from '$lib/group-maker';
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { makeFamilies } from '$lib/server/csv-parser';
+import { createRoutes, getLatAndLong } from '$lib/server/mapping';
+import { createDrivers, createPassengers } from '$lib/server/group-maker';
 import { SECRET_LOCATIONIQ_API_KEY } from '$env/static/private';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -10,10 +10,10 @@ export const POST: RequestHandler = async ({ request }) => {
 	// console.log(driversAndPassengers);
 	// console.log(SECRET_LOCATIONIQ_API_KEY);
 	// getLatAndLong('544 Stony Brook Drive, Bridgewater, NJ', SECRET_LOCATIONIQ_API_KEY);
-	const families = makeFamilies(driversAndPassengers);
+	const families = await makeFamilies(driversAndPassengers);
 	const drivers = createDrivers(families);
-	console.log(drivers);
-	return new Response(JSON.stringify({ success: true, count: driversAndPassengers.length }), {
-		headers: { 'Content-Type': 'application/json' }
-	});
+	const passengers = createPassengers(families);
+	const groups = await createRoutes(drivers, passengers);
+	console.log('GROPUS!!!!', groups);
+	return new json(groups);
 };

@@ -1,0 +1,18 @@
+{  boundingbox: [ '40.737259', '40.737259', '-74.19762', '-74.19762' ],
+                                                                                                              importance: 0.25
+                                                                                                                                }
+                                                                                                                                 ]
+                                                                                                                                  [
+                                                                                                                                     {
+                                                                                                                                          place_id: '333286442086',
+                                                                                                                                                                       licence: '
+https://locationiq.com/attribution',
+                                        lat: '40.681967',
+                                                             lon: '-74.556399',
+                                                                                   display_name: '77, Atlas Road, Basking Ridge, Somerset County, New Jersey, 07920, USA',
+                                                                                                                                                                              bou
+ndingbox: [ '40.681967', '40.681967', '-74.556399', '-74.556399' ],
+                                                                       importance: 0.25
+                                                                                         }
+                                                                                          ]
+}

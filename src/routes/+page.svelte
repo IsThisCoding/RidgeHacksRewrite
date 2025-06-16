@@ -1,7 +1,9 @@
 <script lang="ts">
+	import type { FamilySheetSchema } from '$lib/family';
 	import Papa from 'papaparse';
 
 	let sheetUrl = '';
+	let groups = $state();
 
 	const getSheetId = (url: string) => {
 		const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{44})/);
@@ -35,7 +37,7 @@
 		}
 	};
 
-	async function sendData(driversAndPassengers) {
+	async function sendData(driversAndPassengers: FamilySheetSchema) {
 		console.log(driversAndPassengers);
 		const res = await fetch('/api/process', {
 			method: 'POST',
@@ -43,8 +45,11 @@
 			body: JSON.stringify({ driversAndPassengers })
 		});
 
-		const data = await res.json();
-		console.log(data);
+		if (res.ok) {
+			groups = await res.json();
+		} else {
+			console.error('Failed to process data.');
+		}
 	}
 </script>
 
@@ -56,5 +61,79 @@
 	<button aria-label="submit" onclick={() => fetchData(sheetUrl)}>submit</button>
 </div>
 
+{#if groups}
+	{#each groups as group}
+		<ol>
+			<li>
+				{group.driverName}
+				<ol>
+					{#each group.passengers as passenger}
+						<li>{passenger}</li>
+					{/each}
+				</ol>
+			</li>
+		</ol>
+	{/each}
+{/if}
+
 <style lang="scss">
+	div {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 2rem;
+		max-width: 600px;
+		margin: 0 auto;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	}
+
+	label {
+		font-weight: 600;
+		font-size: 1rem;
+	}
+
+	input[type='text'] {
+		width: 100%;
+		padding: 0.5rem 0.75rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 8px;
+		outline: none;
+		transition: border-color 0.3s;
+
+		&:focus {
+			border-color: #0077ff;
+		}
+	}
+
+	button {
+		background-color: #0077ff;
+		color: white;
+		border: none;
+		padding: 0.6rem 1rem;
+		font-size: 1rem;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: background-color 0.3s;
+
+		&:hover {
+			background-color: #005fcc;
+		}
+	}
+
+	ol {
+		list-style-type: decimal;
+		padding-left: 1.5rem;
+
+		> li {
+			margin: 1rem 0;
+
+			ol {
+				list-style-type: disc;
+				margin-top: 0.5rem;
+				padding-left: 1.5rem;
+			}
+		}
+	}
 </style>

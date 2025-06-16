@@ -42,9 +42,16 @@ export interface Driver {
 	capacity: number;
 }
 
+export interface Passenger {
+	name: string;
+	sex: Sex;
+	latAndLong: Coords;
+}
+
 export interface Family {
 	parents: [Parent, Parent?];
 	children: Child[];
 	passengerCapacity: number;
 	address: string;
+	latAndLong: Coords;
 }
